@@ -2,6 +2,8 @@ function BellCounter() {
 
 	this.countBells = countBells;
 	this.validateInput = validateInput;
+	this.incrementHour = incrementHour;
+	this.getTolls = getTolls;
 
 	function countBells(startTime, endTime) {
 		if (validateInput(startTime, endTime)) {
@@ -13,8 +15,18 @@ function BellCounter() {
 				endHours = parseInt(endInput[0]),
 				endMinutes = parseInt(endInput[1]);
 
-			return 1;
 
+			var sumToll = 0,
+				iStartHour = startHours;
+				debugger;
+
+				do {
+					sumToll += getTolls(iStartHour);
+					iStartHour = incrementHour(iStartHour);
+				}
+				while(iStartHour != endHours);
+
+				return sumToll;
 		} else {
 			console.log('Error in countBells().');
 		}
@@ -29,8 +41,6 @@ function BellCounter() {
 			endMinutes = parseInt(endInput[1]);
 
 		return (
-			startTime.length === 5 &&
-			endTime.length === 5 &&
 			startInput.length === 2 &&
 			endInput.length === 2 &&
 			startMinutes != NaN &&
@@ -49,17 +59,38 @@ function BellCounter() {
 
 	}
 
+	function incrementHour(hour) {
+		if(hour === 23) {
+			return 0;
+		} else {
+			return hour + 1;
+		}
+	}
+
+	function getTolls(hour) {
+		if(hour > 12) {
+			if( hour > 23 ) {
+				console.log('Error in getTolls()');
+			} else {
+				return hour - 12
+			}
+		} else {
+			return hour;
+		}
+	}
 }
 
-var bc = new BellCounter();
+(function() {
+	var bc = new BellCounter();
 
-$('#calculateButton').click(function() {
-	var startTime = $('#startTime').val(),
-		endTime = $('#endTime').val(),
-		valid = bc.validateInput(startTime, endTime);
-	if (valid) {
-		bc.countBells(startTime, endTime);
-	} else {
-		alert('Please enter a valid time (hh:mm) between 00:00 and 23:59');
-	}
-});
+	$('#calculateButton').click(function() {
+		var startTime = $('#startTime').val(),
+			endTime = $('#endTime').val(),
+			valid = bc.validateInput(startTime, endTime);
+		if (valid) {
+			bc.countBells(startTime, endTime);
+		} else {
+			alert('Please enter a valid time (hh:mm) between 00:00 and 23:59');
+		}
+	});
+})();
